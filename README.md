@@ -69,7 +69,7 @@ platform:
 | [Unraid](docs/install.md#unraid) | [TrueNAS SCALE](docs/install.md#truenas-scale) |
 
 Images are published for `linux/amd64` and `linux/arm64`, on
-[GHCR](https://github.com/smichalczyk/framewrk/pkgs/container/framewrk) and
+[GHCR](https://github.com/users/smichalczyk/packages/container/package/framewrk) and
 [Docker Hub](https://hub.docker.com/r/smichalczyk/framewrk).
 
 ### Updating
