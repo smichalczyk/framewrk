@@ -275,7 +275,10 @@ a:focus-visible,.btn:focus-visible,.plat:focus-visible{
   background:var(--mat); border:1px solid var(--line-soft); border-radius:.45rem;
   padding:.55rem; box-shadow:var(--shadow-hung); margin:0;
 }
-.shot img{display:block; width:100%; height:auto; border-radius:.2rem}
+/* aspect-ratio holds the space the height attribute used to reserve, so
+   there is no layout shift and nothing that can squash the image. */
+.shot img{display:block; width:100%; height:auto; aspect-ratio:1800/1188;
+          border-radius:.2rem}
 .shot figcaption{
   font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--ink-faint);
   padding:.7rem .35rem .25rem;
