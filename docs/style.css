@@ -77,8 +77,12 @@ nav.links a{color:var(--ink-soft); text-decoration:none; border-bottom:1px solid
 nav.links a:hover{color:var(--ink); border-bottom-color:var(--brass)}
 
 /* ── Hero ────────────────────────────────────────────────────────── */
-.hero{padding:4.5rem 0 3rem; display:grid; gap:3.5rem; grid-template-columns:1fr}
-@media (min-width:62rem){ .hero{grid-template-columns:1.05fr 1fr; align-items:center; padding:6rem 0 4.5rem} }
+/* padding-block, not the shorthand: `padding: x 0 y` here would reset the
+   horizontal padding .wrap provides, and the hero would run to the edge
+   of a phone screen and push its own grid past the viewport. */
+.hero{padding-block:4.5rem 3rem; display:grid; gap:3.5rem; grid-template-columns:1fr}
+.hero > *{min-width:0}
+@media (min-width:62rem){ .hero{grid-template-columns:1.05fr 1fr; align-items:center; padding-block:6rem 4.5rem} }
 .hero h1{
   font-size:clamp(2.6rem,6.2vw,4.15rem); font-weight:620; font-stretch:88%;
   letter-spacing:-.022em; margin:1rem 0 0; text-wrap:balance;
@@ -105,7 +109,7 @@ nav.links a:hover{color:var(--ink); border-bottom-color:var(--brass)}
    thing this product does. The caption says what just landed, in the
    product's own words. ─────────────────────────────────────────────── */
 .hang{
-  position:relative; display:grid; gap:.9rem;
+  position:relative; display:grid; gap:.9rem; min-width:0;
   grid-template-columns:1.05fr 1.5fr; grid-template-rows:auto auto;
   grid-template-areas:"stem arm1" "stem arm2";
 }
@@ -127,7 +131,7 @@ nav.links a:hover{color:var(--ink); border-bottom-color:var(--brass)}
 .frame.landing{animation:land .85s cubic-bezier(.2,.9,.25,1)}
 @keyframes land{ 0%{transform:translateY(-3px) scale(.985)} 100%{transform:none} }
 .hang-caption{
-  grid-column:1/-1; display:flex; align-items:baseline; gap:.6rem;
+  grid-column:1/-1; min-width:0; overflow-wrap:anywhere; display:flex; align-items:baseline; gap:.6rem;
   font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--ink-faint);
   margin-top:.35rem; min-height:1.4em;
 }
@@ -285,3 +289,8 @@ a:focus-visible,.btn:focus-visible,.plat:focus-visible{
 }
 .shot figcaption b{color:var(--ink-soft); font-weight:600}
 .shots figure + figure{margin-top:1rem}
+
+@media (max-width:40rem){
+  .shot figcaption::after{content:" Tap to open full size."; color:var(--brass)}
+}
+.shot a{display:block; border:0}
