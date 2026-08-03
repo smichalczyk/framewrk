@@ -177,8 +177,10 @@ pre .p{color:var(--brass); user-select:none}
 .steps li b{color:var(--ink); font-weight:600}
 
 /* ── Platforms ───────────────────────────────────────────────────── */
-.grid-plat{display:grid; gap:.75rem; margin-top:2.25rem;
-           grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+/* Seven platforms. minmax is set so they land in one row on a desktop
+   rather than six and a lonely seventh, and fall to two on a phone. */
+.grid-plat{display:grid; gap:.7rem; margin-top:2.25rem;
+           grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr))}
 .plat{
   display:block; text-decoration:none; background:var(--mat);
   border:1px solid var(--line-soft); border-radius:.45rem; padding:1rem 1.1rem;
