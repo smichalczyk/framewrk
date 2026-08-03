@@ -57,6 +57,7 @@ body{
 h1,h2,h3{font-family:"Archivo",ui-sans-serif,system-ui,sans-serif; margin:0; line-height:1.1}
 a{color:inherit}
 img,svg{max-width:100%}
+img{height:auto}   /* never let a height attribute squash a scaled image */
 code,kbd,pre{font-family:"IBM Plex Mono",ui-monospace,monospace}
 
 .wrap{max-width:74rem; margin:0 auto; padding:0 1.5rem}
@@ -274,7 +275,7 @@ a:focus-visible,.btn:focus-visible,.plat:focus-visible{
   background:var(--mat); border:1px solid var(--line-soft); border-radius:.45rem;
   padding:.55rem; box-shadow:var(--shadow-hung); margin:0;
 }
-.shot img{display:block; width:100%; border-radius:.2rem}
+.shot img{display:block; width:100%; height:auto; border-radius:.2rem}
 .shot figcaption{
   font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--ink-faint);
   padding:.7rem .35rem .25rem;
