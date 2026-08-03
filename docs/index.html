@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Framewrk — keep your photo frames filled from PhotoPrism</title>
+<meta name="description" content="Framewrk keeps Aura and Nixplay digital photo frames filled from your own PhotoPrism library. One container, free to use, runs anywhere Docker does.">
+<link rel="icon" href="icon.png">
+<meta property="og:title" content="Framewrk">
+<meta property="og:description" content="Keeps your digital photo frames filled from your own PhotoPrism library.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="./">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="1.5" y="2.5" width="6" height="19" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="2.5" width="11.5" height="6.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="12.5" width="8" height="5.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <b>Framewrk</b>
+    </a>
+    <nav class="links">
+      <a href="#start">Get started</a>
+      <a href="install.html">Install guides</a>
+      <a href="https://github.com/smichalczyk/framewrk">GitHub</a>
+      <a href="https://github.com/smichalczyk/framewrk/discussions">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap hero">
+  <div>
+    <span class="eyebrow">Self-hosted · free to use</span>
+    <h1>Your photo frames, filled from <em>your own</em> library.</h1>
+    <p class="lede">
+      Framewrk watches PhotoPrism, picks the photos that match your rules, and
+      sends them to your Aura and Nixplay frames at the size and shape each
+      screen wants. It remembers what it has already sent, so nothing goes
+      twice — and it takes photos back off when they stop qualifying.
+    </p>
+    <div class="cta">
+      <a class="btn btn-solid" href="#start">Get started</a>
+      <a class="btn btn-quiet" href="install.html">Install guides</a>
+    </div>
+    <p class="aside">One container. No config file. Everything is set up in the console.</p>
+  </div>
+
+  <div class="hang" aria-hidden="true">
+    <div class="frame" data-slot="stem"><div class="plate"></div></div>
+    <div class="frame" data-slot="arm1"><div class="plate"></div></div>
+    <div class="frame" data-slot="arm2"><div class="plate"></div></div>
+    <p class="hang-caption"><span class="dot"></span><span id="cap">Waiting for the next run</span></p>
+  </div>
+</div>
+
+<section class="tinted">
+  <div class="wrap">
+    <span class="eyebrow">What it does</span>
+    <h2>Three things, properly.</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Sends what fits</h3>
+        <p>A portrait frame gets portrait photos. A 1280px screen gets a 1280px
+           file. You set the rule once per frame, or let the whole house share one.</p>
+      </div>
+      <div class="card">
+        <h3>Never sends twice</h3>
+        <p>Every photo is tracked against the frame it went to, by ID. Rename a
+           frame in the Aura or Nixplay app and Framewrk just adopts the new name.</p>
+      </div>
+      <div class="card">
+        <h3>Takes them back off</h3>
+        <p>Narrow a frame to one album and the rest come down on the next run.
+           The console tells you what will happen before it happens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <span class="eyebrow">Get started</span>
+    <h2>Running in about a minute.</h2>
+    <p class="sub">
+      There is nothing to configure first — no config file, no environment to
+      set. One container, one folder, then everything else happens in the
+      console.
+    </p>
+
+<pre><code><span class="p">$</span> mkdir framewrk &amp;&amp; cd framewrk
+<span class="p">$</span> curl -O https://raw.githubusercontent.com/smichalczyk/framewrk/main/compose.yaml
+<span class="p">$</span> docker compose up -d
+<span class="p">$</span> docker compose logs | grep -A2 <span class="c">"Admin password"</span></code></pre>
+
+    <ol class="steps">
+      <li>Open <b>http://your-host:8770</b> and sign in with the password from
+          the log. You are asked to choose your own straight away.</li>
+      <li>Under <b>Source</b>, point it at PhotoPrism and press <b>Test
+          connection</b>. Add your Aura or Nixplay account the same way.</li>
+      <li>Under <b>Frames</b>, press <b>Add</b>. It lists the frames actually on
+          your account — pick one, set its size and shape.</li>
+      <li>Press <b>Sync now</b>, or wait for the schedule.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="tinted">
+  <div class="wrap">
+    <span class="eyebrow">Anywhere Docker runs</span>
+    <h2>Including the NAS it probably belongs on.</h2>
+    <p class="sub">
+      Published for <code>amd64</code> and <code>arm64</code>. Each guide ends
+      with the one thing that actually catches people out on that platform.
+    </p>
+    <div class="grid-plat">
+      <a class="plat" href="install.html#linux"><b>Linux</b><span>docker compose</span></a>
+      <a class="plat" href="install.html#macos"><b>macOS</b><span>Docker Desktop</span></a>
+      <a class="plat" href="install.html#windows"><b>Windows</b><span>Docker Desktop + WSL 2</span></a>
+      <a class="plat" href="install.html#synology"><b>Synology</b><span>Container Manager</span></a>
+      <a class="plat" href="install.html#qnap"><b>QNAP</b><span>Container Station 3</span></a>
+      <a class="plat" href="install.html#unraid"><b>Unraid</b><span>Community Applications</span></a>
+      <a class="plat" href="install.html#truenas-scale"><b>TrueNAS SCALE</b><span>24.10 and newer</span></a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">One detail worth knowing</span>
+    <h2>Nixplay puts an album in between.</h2>
+    <p class="sub">
+      With Aura, a frame is a frame and photos go straight to it. Nixplay does
+      not work that way: you upload into an album, and an album is played by
+      zero or more frames. Most tools hide that and get it wrong. Framewrk shows
+      you frames, and says which album feeds each one.
+    </p>
+    <div class="chain">
+      <span>PhotoPrism</span><i>→</i>
+      <span class="mid">album</span><i>→</i>
+      <span>Hallway Frame</span><i>+</i>
+      <span>Landing Frame</span>
+    </div>
+    <p class="sub">
+      So you can change where a frame's photos land without re-uploading a
+      thing, see what else a frame is playing, and get told plainly when an
+      album is on no frame at all — because nothing you sync into it will ever
+      reach a screen.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="./" style="margin-bottom:.8rem">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="6" height="19" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="2.5" width="11.5" height="6.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="11" y="12.5" width="8" height="5.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <b>Framewrk</b>
+        </a>
+        <p style="margin:.2rem 0 0; max-width:26rem">
+          Keeps your digital photo frames filled from your own PhotoPrism library.
+        </p>
+      </div>
+      <div>
+        <h4>Docs</h4>
+        <ul>
+          <li><a href="install.html">Install guides</a></li>
+          <li><a href="https://github.com/smichalczyk/framewrk#readme">Full documentation</a></li>
+          <li><a href="https://github.com/smichalczyk/framewrk/releases">Releases</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get it</h4>
+        <ul>
+          <li><a href="https://github.com/smichalczyk/framewrk/pkgs/container/framewrk">GHCR</a></li>
+          <li><a href="https://hub.docker.com/r/smichalczyk/framewrk">Docker Hub</a></li>
+          <li><a href="https://github.com/smichalczyk/framewrk/discussions">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="fine">
+      Free to use, on as many machines as you like, for as long as you like.
+      Not open source — no resale, no redistribution, no modified copies passed
+      on. Framewrk is not affiliated with, endorsed by, or connected to Aura,
+      Nixplay or PhotoPrism, and it talks to the first two through interfaces
+      they do not publish and may change at any time. It is not a backup, and
+      neither are the copies on your frames.
+    </p>
+  </div>
+</footer>
+
+<script>
+/* The hero is the product's one job, at a glance: photos arriving on frames,
+   one at a time, with the line the console would actually write. Plates are
+   abstract on purpose — a stock photo here would be somebody else's library. */
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var frames = Array.prototype.slice.call(document.querySelectorAll('.hang .frame'));
+  var cap = document.getElementById('cap');
+  var tones = ['--plate-a','--plate-b','--plate-c','--plate-d','--plate-e'];
+  var names = ['Hallway Frame','Landing Frame','Kitchen'];
+  var shapes = ['a landscape','a portrait','a landscape'];
+  var i = 0;
+
+  function paint(n) {
+    var f = frames[n % frames.length];
+    var tone = tones[(n * 3 + n % 2) % tones.length];
+    f.querySelector('.plate').style.background =
+      'var(' + tone + ') radial-gradient(120% 90% at 30% 15%, rgb(255 255 255/.16), transparent 60%)';
+    if (!reduce.matches) {
+      f.classList.remove('landing');
+      void f.offsetWidth;
+      f.classList.add('landing');
+    }
+    cap.textContent = 'Sent ' + names[n % names.length] + ' ' + shapes[n % shapes.length];
+  }
+
+  // Fill all three straight away so the wall is never empty, then keep going.
+  frames.forEach(function (_, n) {
+    setTimeout(function () { paint(n); i = n + 1; }, reduce.matches ? 0 : 260 * n);
+  });
+  setInterval(function () { paint(i++); }, 3400);
+})();
+</script>
+
+</body>
+</html>

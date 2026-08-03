@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} — Framewrk</title>
+{% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+<link rel="icon" href="{{ '/icon.png' | relative_url }}">
+<link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="1.5" y="2.5" width="6" height="19" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="2.5" width="11.5" height="6.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="11" y="12.5" width="8" height="5.5" rx=".75" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <b>Framewrk</b>
+    </a>
+    <nav class="links">
+      <a href="{{ '/' | relative_url }}">Home</a>
+      <a href="https://github.com/smichalczyk/framewrk">GitHub</a>
+      <a href="https://github.com/smichalczyk/framewrk/discussions">Support</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <a class="back" href="{{ '/' | relative_url }}">← Back</a>
+  <h1>{{ page.title }}</h1>
+  {{ content }}
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="fine" style="margin-top:0">
+      Free to use, not open source. Framewrk is not affiliated with, endorsed by,
+      or connected to Aura, Nixplay or PhotoPrism.
+      <a href="https://github.com/smichalczyk/framewrk">Documentation and support on GitHub</a>.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

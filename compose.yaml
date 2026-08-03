@@ -1,0 +1,44 @@
+services:
+  framewrk:
+    image: ghcr.io/smichalczyk/framewrk:latest
+    container_name: framewrk
+    restart: unless-stopped
+
+    ports:
+      - "8770:8770"
+
+    environment:
+      # Your own user, so files in the data folder belong to you and not to
+      # root — `id -u` and `id -g` on Linux. Leave both out on macOS and
+      # Windows, where Docker Desktop handles ownership itself.
+      - PUID=1000
+      - PGID=1000
+      # Otherwise every timestamp in the logs and the console is UTC.
+      - TZ=Etc/UTC
+
+    volumes:
+      # Everything Framewrk knows is one SQLite file in here.
+      - ./data:/data
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.environ.get('FRAMEWRK_PORT','8770')+'/api/health').read()"]
+      interval: 60s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+# ── If PhotoPrism is a container on this host ───────────────────────────
+# Put both on one network and address it by name — http://photoprism:2342 —
+# rather than chasing a LAN address that may change:
+#
+#   networks: [photoprism_default]
+#   ...
+#   networks:
+#     photoprism_default:
+#       external: true
+#
+# ── If Framewrk cannot reach PhotoPrism at all ──────────────────────────
+# Some setups need the host's network stack. Linux only, and it ignores
+# `ports` — the console lands on the host's 8770 directly:
+#
+#   network_mode: host

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Framewrk">
+  <!--
+    The Framewrk mark: three frames hung so they read as an F. The tall one is
+    the stem, the wide one the top arm, the short one the middle arm — still
+    frames on a wall, which is the point, and now also the letter.
+
+    Tuned for 16px, where the tab actually renders it: solid shapes, 4-unit
+    gaps (2px at 16px) so the letter does not close up, and no interior
+    detail, which only turns to mush at that size.
+  -->
+  <rect width="32" height="32" rx="7" fill="#22271F"/>
+  <rect x="5" y="5" width="6" height="22" rx="1.5" fill="#C9A45C"/>
+  <rect x="15" y="5" width="12" height="8" rx="1.5" fill="#C9A45C"/>
+  <rect x="15" y="17" width="8.5" height="7" rx="1.5" fill="#C9A45C"/>
+</svg>

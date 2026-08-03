@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════════════════════
+   The console calls itself a gallery hang rather than a dashboard, so
+   this page is the wall it hangs on: sage ground, mat board, one
+   metallic. Every colour here is lifted from the product's own tokens,
+   because a landing page that does not look like the thing it sells is
+   a lie told before you have even installed it.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@font-face { font-family:"Archivo"; src:url("fonts/archivo.woff2") format("woff2-variations");
+             font-weight:100 900; font-stretch:62% 125%; font-display:swap; }
+@font-face { font-family:"Public Sans"; src:url("fonts/public-sans.woff2") format("woff2-variations");
+             font-weight:100 900; font-display:swap; }
+@font-face { font-family:"IBM Plex Mono"; src:url("fonts/plex-mono-400.woff2") format("woff2");
+             font-weight:400; font-display:swap; }
+@font-face { font-family:"IBM Plex Mono"; src:url("fonts/plex-mono-600.woff2") format("woff2");
+             font-weight:600; font-display:swap; }
+
+:root{
+  --wall:#d7dcd4; --wall-deep:#c3cabf; --mat:#f7f6f1; --mat-sunk:#eeece4;
+  --ink:#22271f; --ink-soft:#5a6156; --ink-faint:#838b7e;
+  --line:#b5bdb1; --line-soft:#c9d0c5;
+  --brass:#8a6d34; --brass-bright:#9a7b3f; --brass-wash:#ece2cc;
+  --verdigris:#35604f; --verdigris-wash:#d5e2da;
+  --shadow-hung:0 2px 3px rgb(34 39 31/.10), 0 14px 30px -14px rgb(34 39 31/.34);
+  --plate-a:#b8b2a0; --plate-b:#9aa693; --plate-c:#c2ab88;
+  --plate-d:#8d9aa4; --plate-e:#b39a92;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --wall:#232a24; --wall-deep:#1a201b; --mat:#2e362f; --mat-sunk:#283029;
+  --ink:#e8eae4; --ink-soft:#9aa396; --ink-faint:#78826f;
+  --line:#414b41; --line-soft:#384138;
+  --brass:#c9a45c; --brass-bright:#dbb96f; --brass-wash:#3a3323;
+  --verdigris:#5e9a87; --verdigris-wash:#24352e;
+  --shadow-hung:0 2px 4px rgb(0 0 0/.4), 0 16px 34px -14px rgb(0 0 0/.75);
+  --plate-a:#6f6a5d; --plate-b:#5b6656; --plate-c:#7a6a4f;
+  --plate-d:#53606a; --plate-e:#6b5a55;
+}}
+:root[data-theme="dark"]{
+  --wall:#232a24; --wall-deep:#1a201b; --mat:#2e362f; --mat-sunk:#283029;
+  --ink:#e8eae4; --ink-soft:#9aa396; --ink-faint:#78826f;
+  --line:#414b41; --line-soft:#384138;
+  --brass:#c9a45c; --brass-bright:#dbb96f; --brass-wash:#3a3323;
+  --verdigris:#5e9a87; --verdigris-wash:#24352e;
+  --shadow-hung:0 2px 4px rgb(0 0 0/.4), 0 16px 34px -14px rgb(0 0 0/.75);
+  --plate-a:#6f6a5d; --plate-b:#5b6656; --plate-c:#7a6a4f;
+  --plate-d:#53606a; --plate-e:#6b5a55;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--wall); color:var(--ink);
+  font-family:"Public Sans",ui-sans-serif,system-ui,sans-serif;
+  font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Archivo",ui-sans-serif,system-ui,sans-serif; margin:0; line-height:1.1}
+a{color:inherit}
+img,svg{max-width:100%}
+code,kbd,pre{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+.wrap{max-width:74rem; margin:0 auto; padding:0 1.5rem}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace; font-size:.72rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--brass);
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+header{padding:1.75rem 0 0}
+.bar{display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+.brand{display:flex; align-items:center; gap:.6rem; text-decoration:none}
+.brand svg{width:1.6rem; height:1.6rem; color:var(--brass)}
+.brand b{font-family:"Archivo",sans-serif; font-weight:600; font-size:1.15rem; font-stretch:96%}
+nav.links{display:flex; gap:1.4rem; font-size:.92rem}
+nav.links a{color:var(--ink-soft); text-decoration:none; border-bottom:1px solid transparent; padding-bottom:1px}
+nav.links a:hover{color:var(--ink); border-bottom-color:var(--brass)}
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.hero{padding:4.5rem 0 3rem; display:grid; gap:3.5rem; grid-template-columns:1fr}
+@media (min-width:62rem){ .hero{grid-template-columns:1.05fr 1fr; align-items:center; padding:6rem 0 4.5rem} }
+.hero h1{
+  font-size:clamp(2.6rem,6.2vw,4.15rem); font-weight:620; font-stretch:88%;
+  letter-spacing:-.022em; margin:1rem 0 0; text-wrap:balance;
+}
+.hero h1 em{font-style:normal; color:var(--brass)}
+.hero p.lede{font-size:1.16rem; color:var(--ink-soft); max-width:34rem; margin:1.35rem 0 0}
+.cta{display:flex; gap:.75rem; flex-wrap:wrap; margin-top:2rem}
+.btn{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.72rem 1.25rem; border-radius:.4rem; text-decoration:none;
+  font-weight:600; font-size:.95rem; border:1px solid transparent;
+  transition:background .15s, border-color .15s, transform .15s;
+}
+.btn-solid{background:var(--brass); color:var(--mat)}
+.btn-solid:hover{background:var(--brass-bright)}
+.btn-quiet{border-color:var(--line); color:var(--ink)}
+.btn-quiet:hover{border-color:var(--brass); background:var(--mat)}
+.btn:active{transform:translateY(1px)}
+.hero .aside{font-size:.86rem; color:var(--ink-faint); margin-top:1.1rem}
+
+/* ── Signature: the wall ─────────────────────────────────────────────
+   Three frames hung in the arrangement of the mark — tall stem, wide
+   top arm, short middle arm — filling one at a time, which is the only
+   thing this product does. The caption says what just landed, in the
+   product's own words. ─────────────────────────────────────────────── */
+.hang{
+  position:relative; display:grid; gap:.9rem;
+  grid-template-columns:1.05fr 1.5fr; grid-template-rows:auto auto;
+  grid-template-areas:"stem arm1" "stem arm2";
+}
+.frame{
+  background:var(--mat); border:1px solid var(--line-soft); border-radius:.3rem;
+  padding:.55rem; box-shadow:var(--shadow-hung); position:relative;
+}
+.frame .plate{
+  border-radius:.12rem; background:var(--mat-sunk); width:100%; height:100%;
+  transition:background 1.1s ease;
+  background-image:radial-gradient(120% 90% at 30% 15%, rgb(255 255 255/.16), transparent 60%);
+}
+.frame[data-slot="stem"]{grid-area:stem}
+.frame[data-slot="stem"] .plate{aspect-ratio:3/4.6}
+.frame[data-slot="arm1"]{grid-area:arm1}
+.frame[data-slot="arm1"] .plate{aspect-ratio:16/8.4}
+.frame[data-slot="arm2"]{grid-area:arm2; margin-right:14%}
+.frame[data-slot="arm2"] .plate{aspect-ratio:16/9.6}
+.frame.landing{animation:land .85s cubic-bezier(.2,.9,.25,1)}
+@keyframes land{ 0%{transform:translateY(-3px) scale(.985)} 100%{transform:none} }
+.hang-caption{
+  grid-column:1/-1; display:flex; align-items:baseline; gap:.6rem;
+  font-family:"IBM Plex Mono",monospace; font-size:.78rem; color:var(--ink-faint);
+  margin-top:.35rem; min-height:1.4em;
+}
+.hang-caption .dot{
+  width:.4rem; height:.4rem; border-radius:50%; background:var(--verdigris);
+  flex:none; transform:translateY(-.1em);
+}
+@media (prefers-reduced-motion:reduce){
+  .frame .plate{transition:none}
+  .frame.landing{animation:none}
+}
+
+/* ── Sections ────────────────────────────────────────────────────── */
+section{padding:3.5rem 0}
+section.tinted{background:var(--wall-deep)}
+h2{font-size:clamp(1.6rem,3vw,2.1rem); font-weight:600; font-stretch:92%; letter-spacing:-.015em}
+section > .wrap > .eyebrow{display:block; margin-bottom:.7rem}
+.sub{color:var(--ink-soft); max-width:44rem; margin:.85rem 0 0}
+
+.cards{display:grid; gap:1rem; margin-top:2.25rem; grid-template-columns:1fr}
+@media (min-width:48rem){ .cards{grid-template-columns:repeat(3,1fr)} }
+.card{
+  background:var(--mat); border:1px solid var(--line-soft); border-radius:.45rem;
+  padding:1.4rem 1.35rem; box-shadow:var(--shadow-hung);
+}
+.card h3{font-size:1.06rem; font-weight:600; margin-bottom:.5rem}
+.card p{margin:0; font-size:.95rem; color:var(--ink-soft)}
+
+/* ── Quickstart ──────────────────────────────────────────────────── */
+pre{
+  background:var(--mat); border:1px solid var(--line-soft); border-radius:.45rem;
+  padding:1.15rem 1.25rem; overflow-x:auto; font-size:.87rem; line-height:1.75;
+  box-shadow:var(--shadow-hung); margin:1.75rem 0 0;
+}
+pre .c{color:var(--ink-faint)}
+pre .p{color:var(--brass); user-select:none}
+.steps{margin:1.75rem 0 0; padding:0; list-style:none; counter-reset:s}
+.steps li{
+  counter-increment:s; position:relative; padding-left:2.4rem; margin-bottom:1rem;
+  color:var(--ink-soft); font-size:.97rem;
+}
+.steps li::before{
+  content:counter(s); position:absolute; left:0; top:.05em;
+  font-family:"IBM Plex Mono",monospace; font-size:.72rem; font-weight:600;
+  color:var(--brass); border:1px solid var(--line); border-radius:.25rem;
+  width:1.55rem; height:1.55rem; display:grid; place-items:center;
+}
+.steps li b{color:var(--ink); font-weight:600}
+
+/* ── Platforms ───────────────────────────────────────────────────── */
+.grid-plat{display:grid; gap:.75rem; margin-top:2.25rem;
+           grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))}
+.plat{
+  display:block; text-decoration:none; background:var(--mat);
+  border:1px solid var(--line-soft); border-radius:.45rem; padding:1rem 1.1rem;
+  transition:border-color .15s, transform .15s;
+}
+.plat:hover{border-color:var(--brass); transform:translateY(-2px)}
+.plat b{display:block; font-family:"Archivo",sans-serif; font-weight:600; font-size:1rem}
+.plat span{display:block; font-size:.82rem; color:var(--ink-faint); margin-top:.2rem}
+
+/* ── Nixplay explainer ───────────────────────────────────────────── */
+.chain{
+  display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin-top:1.75rem;
+  font-family:"IBM Plex Mono",monospace; font-size:.84rem;
+}
+.chain span{
+  background:var(--mat); border:1px solid var(--line-soft);
+  border-radius:.3rem; padding:.45rem .8rem;
+}
+.chain span.mid{border-color:var(--brass); color:var(--brass); background:var(--brass-wash)}
+.chain i{font-style:normal; color:var(--ink-faint)}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+footer{
+  padding:3rem 0 4rem; border-top:1px solid var(--line);
+  font-size:.88rem; color:var(--ink-faint);
+}
+footer .cols{display:grid; gap:2rem; grid-template-columns:1fr}
+@media (min-width:48rem){ footer .cols{grid-template-columns:2fr 1fr 1fr} }
+footer h4{font-family:"Archivo",sans-serif; font-size:.82rem; font-weight:600;
+          text-transform:uppercase; letter-spacing:.1em; color:var(--ink-soft); margin:0 0 .7rem}
+footer ul{list-style:none; margin:0; padding:0}
+footer li{margin-bottom:.4rem}
+footer a{color:var(--ink-soft); text-decoration:none}
+footer a:hover{color:var(--brass)}
+footer .fine{margin-top:2.5rem; max-width:46rem; line-height:1.65}
+
+a:focus-visible,.btn:focus-visible,.plat:focus-visible{
+  outline:2px solid var(--brass); outline-offset:2px; border-radius:.25rem;
+}
+
+/* ── Long-form document pages (the install guide) ───────────────────
+   Same wall and mat board, but set for reading: one column, generous
+   measure, and headings that stay findable when you are scrolling for
+   your own platform rather than reading start to finish. ─────────── */
+.doc{max-width:46rem; margin:0 auto; padding:3rem 1.5rem 5rem}
+.doc h1{font-size:clamp(2rem,5vw,2.9rem); font-weight:620; font-stretch:90%;
+        letter-spacing:-.02em; margin:.5rem 0 1.5rem}
+.doc h2{
+  font-size:1.5rem; margin:3.5rem 0 1rem; padding-top:1.5rem;
+  border-top:1px solid var(--line); scroll-margin-top:1.5rem;
+}
+.doc h3{font-size:1.08rem; font-weight:600; margin:2rem 0 .6rem; scroll-margin-top:1.5rem}
+.doc p{margin:0 0 1.1rem; color:var(--ink-soft)}
+.doc p strong,.doc li strong{color:var(--ink); font-weight:600}
+.doc a{color:var(--brass); text-decoration:none; border-bottom:1px solid var(--line)}
+.doc a:hover{border-bottom-color:var(--brass)}
+.doc ul,.doc ol{margin:0 0 1.2rem; padding-left:1.35rem; color:var(--ink-soft)}
+.doc li{margin-bottom:.5rem}
+.doc code{
+  background:var(--mat-sunk); border:1px solid var(--line-soft); border-radius:.22rem;
+  padding:.08em .34em; font-size:.86em; color:var(--ink);
+}
+.doc pre{margin:0 0 1.4rem}
+.doc pre code{background:none; border:0; padding:0; font-size:inherit; color:var(--ink-soft)}
+.doc table{
+  width:100%; border-collapse:collapse; margin:0 0 1.4rem; font-size:.93rem;
+  background:var(--mat); box-shadow:var(--shadow-hung); border-radius:.4rem; overflow:hidden;
+}
+.doc th,.doc td{text-align:left; padding:.6rem .85rem; border-bottom:1px solid var(--line-soft)}
+.doc th{font-family:"Archivo",sans-serif; font-weight:600; font-size:.82rem;
+        text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft)}
+.doc tr:last-child td{border-bottom:0}
+.doc hr{border:0; border-top:1px solid var(--line); margin:3rem 0}
+.doc blockquote{
+  margin:0 0 1.2rem; padding:.1rem 0 .1rem 1.1rem;
+  border-left:2px solid var(--brass); color:var(--ink-soft);
+}
+.doc .table-scroll{overflow-x:auto}
+.back{
+  display:inline-flex; align-items:center; gap:.4rem; font-size:.88rem;
+  color:var(--ink-faint); text-decoration:none; border:0;
+}
+.back:hover{color:var(--brass)}
