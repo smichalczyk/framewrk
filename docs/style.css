@@ -264,3 +264,21 @@ a:focus-visible,.btn:focus-visible,.plat:focus-visible{
   color:var(--ink-faint); text-decoration:none; border:0;
 }
 .back:hover{color:var(--brass)}
+
+/* ── Screenshots ────────────────────────────────────────────────────
+   Hung the same way the frames in the hero are, because the console
+   calls itself a gallery hang and a screenshot floating on a plain
+   background would be the one place on this page that forgot. ───── */
+.shots{display:grid; gap:1rem; margin-top:2.25rem}
+.shot{
+  background:var(--mat); border:1px solid var(--line-soft); border-radius:.45rem;
+  padding:.55rem; box-shadow:var(--shadow-hung); margin:0;
+}
+.shot img{display:block; width:100%; border-radius:.2rem}
+.shot figcaption{
+  font-family:"IBM Plex Mono",monospace; font-size:.76rem; color:var(--ink-faint);
+  padding:.7rem .35rem .25rem;
+}
+.shot figcaption b{color:var(--ink-soft); font-weight:600}
+.shots-pair{display:grid; gap:1rem; grid-template-columns:1fr}
+@media (min-width:52rem){ .shots-pair{grid-template-columns:1fr 1fr} }
