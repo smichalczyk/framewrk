@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Framewrk — keep your photo frames filled from PhotoPrism</title>
-<meta name="description" content="Framewrk keeps Aura and Nixplay digital photo frames filled from your own PhotoPrism library. One container, free to use, runs anywhere Docker does.">
+<title>Framewrk — keep your photo frames filled from PhotoPrism or Immich</title>
+<meta name="description" content="Framewrk keeps Aura and Nixplay digital photo frames filled from your own PhotoPrism and/or Immich library. One container, free to use, runs anywhere Docker does.">
 <link rel="icon" href="icon.png">
 <meta property="og:title" content="Framewrk">
-<meta property="og:description" content="Keeps your digital photo frames filled from your own PhotoPrism library.">
+<meta property="og:description" content="Keeps your digital photo frames filled from your own PhotoPrism and/or Immich library.">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="style.css?v=2">
 </head>
@@ -37,8 +37,8 @@
     <span class="eyebrow">Self-hosted · free to use</span>
     <h1>Your photo frames, filled from <em>your own</em> library.</h1>
     <p class="lede">
-      Framewrk watches PhotoPrism, picks the photos that match your rules, and
-      sends them to your Aura and Nixplay frames at the size and shape each
+      Framewrk watches PhotoPrism, Immich, or both, picks the photos that match
+      your rules, and sends them to your Aura and Nixplay frames at the size and shape each
       screen wants. It remembers what it has already sent, so nothing goes
       twice — and it takes photos back off when they stop qualifying.
     </p>
@@ -87,8 +87,8 @@
     <h2>Set up in a browser, not a config file.</h2>
     <p class="sub">
       Framewrk has no configuration file and nothing to set before it starts.
-      Everything — PhotoPrism, your frame accounts, which photos qualify, what
-      each screen gets — is here.
+      Everything — PhotoPrism and/or Immich, your frame accounts, which photos
+      qualify, what each screen gets — is here.
     </p>
 
     <div class="shots">
@@ -105,8 +105,8 @@
       </figure>
       <figure class="shot">
         <a href="shots/source.jpg"><img src="shots/source.jpg" width="1800" loading="lazy"
-             alt="The Source screen: the PhotoPrism address, username and password, a Test connection button, and the rules for which photos qualify."></a>
-        <figcaption><b>Source.</b> Where photos come from and which ones qualify.</figcaption>
+             alt="The Source screen: photo-source connection fields, a Test connection button, and the rules for which photos qualify."></a>
+        <figcaption><b>Source.</b> Connect PhotoPrism, Immich, or both, then choose which photos qualify.</figcaption>
       </figure>
     </div>
   </div>
@@ -130,8 +130,8 @@
     <ol class="steps">
       <li>Open <b>http://your-host:8770</b> and sign in with the password from
           the log. You are asked to choose your own straight away.</li>
-      <li>Under <b>Source</b>, point it at PhotoPrism and press <b>Test
-          connection</b>. Add your Aura or Nixplay account the same way.</li>
+      <li>Under <b>Source</b>, connect PhotoPrism, Immich, or both and press
+          <b>Test connection</b>. Add your Aura or Nixplay account the same way.</li>
       <li>Under <b>Frames</b>, press <b>Add</b>. It lists the frames actually on
           your account — pick one, set its size and shape.</li>
       <li>Press <b>Sync now</b>, or wait for the schedule.</li>
@@ -170,7 +170,7 @@
       you frames, and says which album feeds each one.
     </p>
     <div class="chain">
-      <span>PhotoPrism</span><i>→</i>
+      <span>PhotoPrism / Immich</span><i>→</i>
       <span class="mid">album</span><i>→</i>
       <span>Hallway Frame</span><i>+</i>
       <span>Landing Frame</span>
@@ -197,7 +197,7 @@
           <b>Framewrk</b>
         </a>
         <p style="margin:.2rem 0 0; max-width:26rem">
-          Keeps your digital photo frames filled from your own PhotoPrism library.
+          Keeps your digital photo frames filled from your own PhotoPrism and/or Immich library.
         </p>
       </div>
       <div>
@@ -221,7 +221,7 @@
       Free to use, on as many machines as you like, for as long as you like.
       Not open source — no resale, no redistribution, no modified copies passed
       on. Framewrk is not affiliated with, endorsed by, or connected to Aura,
-      Nixplay or PhotoPrism, and it talks to the first two through interfaces
+      Nixplay, PhotoPrism or Immich, and it talks to the first two through interfaces
       they do not publish and may change at any time. It is not a backup, and
       neither are the copies on your frames.
     </p>

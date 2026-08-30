@@ -27,9 +27,10 @@ services:
       start_period: 20s
       retries: 3
 
-# ── If PhotoPrism is a container on this host ───────────────────────────
-# Put both on one network and address it by name — http://photoprism:2342 —
-# rather than chasing a LAN address that may change:
+# ── If a photo source is a container on this host ───────────────────────
+# Put it on a shared network and address it by name — for example
+# http://photoprism:2342 or http://immich:2283 — rather than chasing a LAN
+# address that may change:
 #
 #   networks: [photoprism_default]
 #   ...
@@ -37,7 +38,7 @@ services:
 #     photoprism_default:
 #       external: true
 #
-# ── If Framewrk cannot reach PhotoPrism at all ──────────────────────────
+# ── If Framewrk cannot reach the photo source at all ────────────────────
 # Some setups need the host's network stack. Linux only, and it ignores
 # `ports` — the console lands on the host's 8770 directly:
 #

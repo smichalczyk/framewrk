@@ -18,8 +18,8 @@ people out there.
 - [Unraid](#unraid)
 - [TrueNAS SCALE](#truenas-scale)
 
-**Before you start**, you need a PhotoPrism instance Framewrk can reach, and an
-Aura and/or Nixplay account with at least one frame on it.
+**Before you start**, you need a PhotoPrism and/or Immich instance Framewrk can
+reach, and an Aura and/or Nixplay account with at least one frame on it.
 
 **After it starts**, on every platform: open `http://<host>:8770`, find the
 one-time admin password in the container log, sign in, and choose your own
@@ -49,12 +49,12 @@ docker compose up -d
 docker compose logs | grep -A2 "Admin password"
 ```
 
-**Reaching PhotoPrism.** If PhotoPrism is a container on the same host, put both
-on one network and address it by name (`http://photoprism:2342`) rather than a
-LAN address that can change. Uncomment the `networks` block at the bottom of
-`compose.yaml`. If Framewrk still cannot see it, `network_mode: host` usually
-settles it — Linux only, and it ignores `ports`, so the console lands on the
-host's 8770 directly.
+**Reaching a photo source.** If PhotoPrism or Immich is a container on the same
+host, put both on one network and address it by name (`http://photoprism:2342`
+or `http://immich:2283`) rather than a LAN address that can change. Uncomment
+the `networks` block at the bottom of `compose.yaml`. If Framewrk still cannot
+see it, `network_mode: host` usually settles it — Linux only, and it ignores
+`ports`, so the console lands on the host's 8770 directly.
 
 **The catch:** leave `PUID`/`PGID` unset and everything in `data/` ends up owned
 by root. It works, right up until the day you want to read your own backup.
@@ -257,8 +257,8 @@ Click **Validate**, then **Create**.
   and Web Server or QuMagie may hold others. 8770 is not a QNAP default, but if
   the container will not start, check that before assuming the image is broken —
   and remap the host side (`"8771:8770"`) rather than moving QTS.
-- If PhotoPrism is on another VLAN, Container Station's **qnet** driver gives
-  Framewrk its own LAN address. Bridge is fine otherwise.
+- If the photo source is on another VLAN, Container Station's **qnet** driver
+  gives Framewrk its own LAN address. Bridge is fine otherwise.
 
 ---
 
@@ -354,6 +354,16 @@ services:
   anything and only fails at deploy.
 - TrueNAS does not proxy the app, so port 8770 has to be free on the host.
 
+## Immich setup
+
+Framewrk supports Immich **3.1 or newer**. In the Source screen, enter your
+Immich URL and create an API key with asset read/download and album read access.
+You may configure Immich by itself or alongside PhotoPrism.
+
+The shared **Quality** setting uses Immich's optional star rating. `0` skips the
+rating filter; `1` through `5` select that rating and above. Enable and assign
+ratings in Immich under **User Settings → Features → Rating**.
+
 ---
 
 ## Something went wrong
@@ -364,9 +374,9 @@ services:
   an empty database. If you have restarted since, and did not write it down,
   stop the container, delete `sync.db`, and start again — you lose the
   configuration, not the photos on your frames.
-- **"Cannot reach PhotoPrism".** Press *Test connection* under **Source** for
-  the actual reason. From another container, a LAN address often will not work
-  where a container name will.
+- **"Cannot reach a photo source".** Press *Test connection* under **Source**
+  for the actual reason. From another container, a LAN address often will not
+  work where a container name will.
 - **Timestamps are all wrong.** `TZ` is not set.
 
 Still stuck? [Open a discussion](https://github.com/smichalczyk/framewrk/discussions)

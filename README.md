@@ -5,7 +5,7 @@
 <h1 align="center">Framewrk</h1>
 
 <p align="center">
-  Keeps your digital photo frames filled from your own PhotoPrism library.<br>
+  Keeps your digital photo frames filled from your own PhotoPrism and/or Immich library.<br>
   <a href="https://smichalczyk.github.io/framewrk/">Website</a> ·
   <a href="docs/install.md">Install guides</a> ·
   <a href="https://github.com/smichalczyk/framewrk/discussions">Discussions</a>
@@ -13,8 +13,8 @@
 
 ---
 
-Framewrk watches PhotoPrism, picks the photos that match your rules, and pushes
-them to Aura and Nixplay frames at the right size and shape for each one. It
+Framewrk watches PhotoPrism and Immich, picks the photos that match your rules,
+and pushes them to Aura and Nixplay frames at the right size and shape for each one. It
 remembers what it has already sent, so nothing is uploaded twice, and it takes
 photos back off a frame when they no longer qualify.
 
@@ -49,13 +49,23 @@ either way the first sign-in requires a change.
 
 Then, in the console:
 
-1. **Source** — point Framewrk at PhotoPrism and press *Test connection*. Add
-   your Aura and/or Nixplay account the same way.
+1. **Source** — connect PhotoPrism, Immich, or both, then press *Test
+   connection*. For Immich, create an API key with asset read/download and
+   album read access. Add your Aura and/or Nixplay account the same way.
 2. **Frames** — press *Add*. Framewrk lists the frames actually on your
    account; pick one, choose an image size that matches its screen, and choose
    whether it should get landscape photos, portrait, or anything. Each frame can
    also draw from its own slice of the library instead of the household rule.
 3. **The wall** — press *Sync now*, or wait for the schedule.
+
+### Photo sources
+
+Use PhotoPrism, Immich, or both. Immich **3.1 or newer** is required; create
+an API key with asset read/download and album read access.
+
+The shared **Quality** setting uses Immich's optional star rating. `0` disables
+the rating filter; `1` through `5` select that rating and above. Enable ratings
+in Immich at **User Settings → Features → Rating** before assigning stars.
 
 ### Where you are running it
 
@@ -93,7 +103,7 @@ installation.
 |---|---|
 | **The wall** | Every frame with the photo currently on it, a 30-day activity chart, and recent runs. Sync now and stop live here. |
 | **Frames** | One card per screen on your walls. Add, pause, configure and remove them across both services. |
-| **Source** | PhotoPrism connection, which photos qualify, how often to check, and your frame accounts. |
+| **Source** | PhotoPrism and Immich connections, which photos qualify, how often to check, and your frame accounts. |
 | **Logs** | Everything Framewrk has done, kept across restarts. Filter by level, search, follow live, download. |
 | **Settings** | Password, sign-in cookie and proxy behaviour, how long to keep logs, and which version you are running. |
 
@@ -215,25 +225,25 @@ the outside.
 ## How it works
 
 ```
-PhotoPrism ──▶ scheduler ──▶ worker ──▶ Aura / Nixplay
-                   │            │
-                   └── SQLite ──┘   settings · frames · what was sent · runs · logs
+PhotoPrism / Immich ──▶ scheduler ──▶ worker ──▶ Aura / Nixplay
+                            │            │
+                            └── SQLite ──┘   settings · frames · what was sent · runs · logs
 ```
 
 One process, a few threads: a scheduler that decides when to run, a single
 worker so two syncs can never overlap, a log writer that batches to SQLite, and
 the web server. State is one SQLite file in `/data`.
 
-Photos are matched on their PhotoPrism ID, and destinations are tracked by the
-vendor's own ID, so renaming a frame or an album in the Aura or Nixplay app is
-safe — Framewrk just adopts the new name.
+Photos are matched on their source-specific ID, and destinations are tracked by
+the vendor's own ID, so renaming a frame or an album in the Aura or Nixplay app
+is safe — Framewrk just adopts the new name.
 
 ---
 
 ## Notes
 
 - Uploads are deliberately paced (a short pause per photo) so a large first sync
-  does not overwhelm PhotoPrism. Set a batch size under **Source** to spread it
+  does not overwhelm the photo source. Set a batch size under **Source** to spread it
   further.
 - Service passwords are stored in the database in plain text, and the file is
   restricted to its owner. Encrypting them would not help: the container has to
@@ -260,5 +270,5 @@ source: no resale, no redistribution, no modified copies passed on. See
 
 This repository holds the documentation. The source is not public.
 
-Framewrk is not affiliated with, endorsed by, or connected to Aura, Nixplay or
-PhotoPrism.
+Framewrk is not affiliated with, endorsed by, or connected to Aura, Nixplay,
+PhotoPrism or Immich.

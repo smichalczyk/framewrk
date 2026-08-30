@@ -1,7 +1,7 @@
 # GitHub Pages builds this folder. Only the guide goes through Jekyll —
 # index.html has no front matter, so it is served exactly as written.
 title: Framewrk
-description: Keeps your digital photo frames filled from your own PhotoPrism library.
+description: Keeps your digital photo frames filled from your own PhotoPrism and/or Immich library.
 url: https://smichalczyk.github.io
 baseurl: /framewrk
 markdown: kramdown
