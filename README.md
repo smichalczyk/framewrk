@@ -6,8 +6,8 @@
 
 <p align="center">
   Keeps your digital photo frames filled from your own PhotoPrism and/or Immich library.<br>
-  <a href="https://smichalczyk.github.io/framewrk/">Website</a> ·
-  <a href="docs/install.md">Install guides</a> ·
+  <a href="https://hangframewrk.io/">Website</a> ·
+  <a href="https://hangframewrk.io/install.html">Install guides</a> ·
   <a href="https://github.com/smichalczyk/framewrk/discussions">Discussions</a>
 </p>
 
@@ -93,9 +93,9 @@ platform:
 
 | | |
 |---|---|
-| [Linux](docs/install.md#linux) | [macOS](docs/install.md#macos) · [Windows](docs/install.md#windows) |
-| [Synology](docs/install.md#synology) | [QNAP](docs/install.md#qnap) |
-| [Unraid](docs/install.md#unraid) | [TrueNAS SCALE](docs/install.md#truenas-scale) |
+| [Linux](https://hangframewrk.io/install.html#linux) | [macOS](https://hangframewrk.io/install.html#macos) · [Windows](https://hangframewrk.io/install.html#windows) |
+| [Synology](https://hangframewrk.io/install.html#synology) | [QNAP](https://hangframewrk.io/install.html#qnap) |
+| [Unraid](https://hangframewrk.io/install.html#unraid) | [TrueNAS SCALE](https://hangframewrk.io/install.html#truenas-scale) |
 
 Images are published for `linux/amd64` and `linux/arm64`, on
 [GHCR](https://github.com/users/smichalczyk/packages/container/package/framewrk) and
