@@ -23,6 +23,24 @@ logs. Free to use.
 
 ---
 
+## Send directly from iPhone or iPad
+
+The Framewrk iOS beta can send photos without PhotoPrism or Immich. Connect
+Aura or Nixplay and configure a frame in the console, then connect the app to
+your HTTPS server address using your console password. The app stores a
+revocable device token in Keychain.
+
+Choose up to 50 photos in the app, or select photos in Photos or another app
+and choose **Share → Framewrk**. Pick the frames and send. Background uploads
+continue after the sheet closes; **Recent** shows delivery and retries.
+Nixplay sends use configured albums and disclose other frames playing them.
+
+Direct photos stay on the frames independently of library rules. The console’s
+**Direct sends** page shows history, and **Settings → Connected devices** revokes
+a device. Full images are retained for retries for up to 7 days; previews last
+90 days. Allow at least 17 MiB request bodies through your HTTPS reverse proxy.
+
+
 ## Getting started
 
 Nothing to configure before it starts. There is no config file to write and no
