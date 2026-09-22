@@ -291,3 +291,11 @@ This repository holds the documentation. The source is not public.
 
 Framewrk is not affiliated with, endorsed by, or connected to Aura, Nixplay,
 PhotoPrism or Immich.
+
+## Proxmox LXC preview
+
+Install Framewrk directly in an unprivileged Ubuntu 24.04 LXC, without Docker
+or nesting. The preview targets Proxmox VE 8.4.21 and awaits real-host testing.
+See [installation, updates, rollback and the tester checklist](proxmox/README.md).
+Download the installer package and checksum from the
+[1.3.0 release](https://github.com/smichalczyk/framewrk/releases/tag/v1.3.0).

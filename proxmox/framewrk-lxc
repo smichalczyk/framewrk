@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# Install/update inside a dedicated, unprivileged Ubuntu 24.04 / Debian 13 LXC.
+set -Eeuo pipefail
+umask 027
+fail() { echo "Error: $*" >&2; exit 1; }
+[[ $EUID == 0 ]] || fail 'Run as root inside the Framewrk container.'
+[[ $# == 1 && $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?$ ]] || fail 'Usage: framewrk-lxc VERSION (for example 1.3.0)'
+version=$1
+# shellcheck disable=SC1091
+. /etc/os-release
+[[ ( $ID == ubuntu && $VERSION_ID == 24.04 ) || ( $ID == debian && $VERSION_ID == 13 ) ]] || fail 'Ubuntu 24.04 or Debian 13 is required.'
+[[ $(ps -p 1 -o comm=) == systemd ]] || fail 'systemd must be running as PID 1.'
+systemd-detect-virt --container --quiet || fail 'Run inside a dedicated container, not on the host.'
+exec 9>/run/framewrk-install.lock
+flock -n 9 || fail 'Another install/update is running.'
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install -y --no-install-recommends ca-certificates curl python3 python3-venv skopeo umoci sqlite3 tzdata
+base=/opt/framewrk
+state=/var/lib/framewrk
+install -d -m 755 "$base/releases"
+getent passwd framewrk >/dev/null || useradd --system --home-dir "$state" --shell /usr/sbin/nologin framewrk
+install -d -m 750 -o framewrk -g framewrk "$state"
+install -d -m 700 /var/backups/framewrk
+work=$(mktemp -d "$base/.download.XXXXXX")
+trap 'rm -rf "$work"' EXIT
+image="docker://ghcr.io/smichalczyk/framewrk:$version"
+skopeo copy --digestfile "$work/image-digest" "$image" "oci:$work/image:release"
+umoci unpack --rootless --image "$work/image:release" "$work/bundle"
+app="$work/bundle/rootfs/app"
+[[ -f $app/src/__init__.py && -f $app/web/dist/index.html ]] || fail 'Image is missing application files.'
+python3 - "$app/src/__init__.py" "$version" <<'PY'
+import re,sys
+assert re.search(r'^__version__\s*=\s*"'+re.escape(sys.argv[2])+r'"',open(sys.argv[1]).read(),re.M), 'Image version mismatch'
+PY
+release="$base/releases/$version-$(date -u +%Y%m%dT%H%M%S)-$$"
+install -d -m 755 "$release"
+cp "$work/image-digest" "$release/image-digest"
+cp -R "$app/src" "$app/web" "$app/LICENSE" "$app/requirements.txt" "$release/"
+python3 -m venv "$release/venv"
+# Reuse the dependency versions shipped in the published image.
+python3 - "$work/bundle/rootfs" "$release/constraints.txt" <<'PYTHON'
+from pathlib import Path
+from email.parser import Parser
+import sys
+pins = []
+for metadata in Path(sys.argv[1]).glob('usr/local/lib/python*/site-packages/*.dist-info/METADATA'):
+    fields = Parser().parsestr(metadata.read_text())
+    if fields['Name'].lower() not in ('pip', 'setuptools', 'wheel'):
+        pins.append(f"{fields['Name']}=={fields['Version']}")
+if not pins:
+    raise SystemExit('No dependency metadata in image')
+Path(sys.argv[2]).write_text('\n'.join(sorted(pins)) + '\n')
+PYTHON
+"$release/venv/bin/pip" install --no-cache-dir --disable-pip-version-check -r "$release/requirements.txt" -c "$release/constraints.txt"
+chmod -R a+rX "$release"
+previous=
+if [[ -L $base/current && -d $base/current ]]; then previous=$(readlink -f "$base/current"); fi
+if systemctl cat framewrk.service >/dev/null 2>&1; then systemctl stop framewrk; fi
+stamp=$(date -u +%Y%m%dT%H%M%S)-$$
+backup=/var/backups/framewrk/$stamp
+install -d -m 700 "$backup"
+# Service is stopped: preserve DB, WAL, uploaded files and all other state together.
+cp -a "$state" "$backup/data"
+printf '%s\n' "$previous" > "$backup/previous-release"
+if [[ -f /etc/systemd/system/framewrk.service ]]; then cp -a /etc/systemd/system/framewrk.service "$backup/service"; fi
+activate() { ln -sfn "$1" "$base/.next"; mv -Tf "$base/.next" "$base/current"; }
+rollback() {
+  trap - ERR
+  systemctl stop framewrk || true
+  mv "$state" "$backup/failed-data"
+  cp -a "$backup/data" "$state"
+  if [[ -n $previous ]]; then
+    activate "$previous"
+    cp -a "$backup/service" /etc/systemd/system/framewrk.service
+    systemctl daemon-reload
+    systemctl start framewrk
+  else
+    systemctl disable framewrk || true
+    rm -f "$base/current"
+  fi
+  fail "Activation failed; prior data/code restored. See journalctl -u framewrk and $backup."
+}
+trap rollback ERR
+# Root owns the code; only persistent application data is writable by the service.
+cat > /etc/systemd/system/framewrk.service <<'UNIT'
+[Unit]
+Description=Framewrk photo frame server
+Wants=network-online.target
+After=network-online.target
+[Service]
+Type=simple
+User=framewrk
+Group=framewrk
+WorkingDirectory=/opt/framewrk/current
+Environment=DB_PATH=/var/lib/framewrk/sync.db
+Environment=FRAMEWRK_WEB_DIST=/opt/framewrk/current/web/dist
+Environment=FRAMEWRK_BIND=0.0.0.0
+Environment=FRAMEWRK_PORT=8770
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/framewrk/current/venv/bin/python -m src
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=120
+UMask=0027
+NoNewPrivileges=true
+[Install]
+WantedBy=multi-user.target
+UNIT
+activate "$release"
+systemctl daemon-reload
+systemctl enable framewrk
+systemctl start framewrk || true
+healthy=false
+for _ in {1..30}; do
+  if systemctl is-active --quiet framewrk && curl --fail --silent http://127.0.0.1:8770/api/health | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(d.get("status") != "ok" or d.get("version") != sys.argv[1])' "$version"; then healthy=true; break; fi
+  sleep 2
+done
+if [[ $healthy != true ]]; then rollback; fi
+trap - ERR
+install -m 755 "$(readlink -f "$0")" /usr/local/sbin/framewrk-lxc.new
+mv /usr/local/sbin/framewrk-lxc.new /usr/local/sbin/framewrk-lxc
+printf 'Framewrk %s is running on port 8770.\nBackup: %s\nLogs/password: journalctl -u framewrk\n' "$version" "$backup"
+echo 'Old releases and backups are retained. Remove older ones after verifying your upgrade.'
