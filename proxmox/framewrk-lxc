@@ -15,8 +15,22 @@ systemd-detect-virt --container --quiet || fail 'Run inside a dedicated containe
 exec 9>/run/framewrk-install.lock
 flock -n 9 || fail 'Another install/update is running.'
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y --no-install-recommends ca-certificates curl python3 python3-venv skopeo umoci sqlite3 tzdata
+# Detect DNS failure before apt emits pages of package errors. Recheck here
+# because this updater also runs directly in an existing container.
+for host in deb.debian.org security.debian.org ghcr.io pypi.org files.pythonhosted.org github.com; do
+ resolved=false
+ for _ in {1..3}; do
+   if timeout 5 getent ahosts "$host" >/dev/null; then resolved=true; break; fi
+   sleep 2
+ done
+ if [[ $resolved != true ]]; then
+   cat /etc/resolv.conf >&2
+   ip -4 route >&2 || true
+   fail "Cannot resolve $host. Fix this container's DNS/network in Proxmox, then rerun framewrk-lxc $version. No application data was changed."
+ fi
+done
+apt-get -o Acquire::Retries=3 -o APT::Update::Error-Mode=any update
+apt-get -o Acquire::Retries=3 install -y --no-install-recommends ca-certificates curl python3 python3-venv skopeo umoci sqlite3 tzdata
 base=/opt/framewrk
 state=/var/lib/framewrk
 install -d -m 755 "$base/releases"

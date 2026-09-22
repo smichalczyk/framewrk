@@ -3,7 +3,7 @@
 # default/advanced workflow; not affiliated with or dependent on their framework.
 set -Eeuo pipefail
 APP_VERSION=1.3.0
-INSTALLER_SHA256=9b4c3054fb088374591b74ff13228fb734dcb04151e7624ba3a98f4d5e9bf95b
+INSTALLER_SHA256=05f7331ee54f270933ba39cdf05fa35fa486e191b338d3973ba271017acd7986
 INSTALLER_URL=https://raw.githubusercontent.com/smichalczyk/framewrk/main/proxmox/framewrk-lxc
 created=false
 work=
@@ -45,6 +45,24 @@ choose() {
 }
 input() { ui --title "$1" --inputbox "$2" 10 72 "$3"; }
 number() { [[ $1 =~ ^[0-9]+$ ]] && (( 10#$1 >= $2 && 10#$1 <= $3 )); }
+validate_dns() {
+ python3 - "$1" <<'PYTHON'
+import ipaddress,sys
+for item in sys.argv[1].split():
+    address=ipaddress.ip_address(item)
+    if address.is_loopback or address.is_unspecified or address.is_multicast:
+        raise SystemExit('Use a DNS server reachable from the container, not a loopback address.')
+PYTHON
+}
+network_ready() {
+ for _ in {1..12}; do
+   # The variable is expanded inside the container shell.
+   # shellcheck disable=SC2016
+   if pct exec "$ctid" -- timeout 10 bash -c 'for host in deb.debian.org security.debian.org ghcr.io pypi.org files.pythonhosted.org github.com; do getent ahosts "$host" >/dev/null || exit 1; done'; then return 0; fi
+   sleep 2
+ done
+ return 1
+}
 printf '\nFramewrk — Debian 12 LXC\n'
 mode=$(ui --title 'Create Framewrk' --menu 'Creates a new unprivileged Debian container and installs Framewrk. Preview: awaiting real Proxmox testing.' 14 78 3 default 'Default: 2 cores / 1 GB RAM / 8 GB disk / DHCP' advanced 'Customize resources and networking' cancel 'Exit') || exit 0
 [[ $mode != cancel ]] || exit 0
@@ -57,6 +75,7 @@ version=$APP_VERSION
 network=dhcp
 gateway=
 vlan=
+dns=
 root_storage=$(choose 'Container disk' rootdir local-lvm) || exit 1
 template_storage=$(choose 'Debian template' vztmpl local) || exit 1
 bridges=()
@@ -73,9 +92,11 @@ if [[ $mode == advanced ]]; then
  disk=$(input Disk 'Container disk in GB (8–1024)' "$disk") || exit 0
  network=$(input 'IPv4 address' 'Enter dhcp, or a static address with prefix (for example 192.168.1.50/24)' "$network") || exit 0
  if [[ $network != dhcp ]]; then gateway=$(input Gateway 'IPv4 gateway (for example 192.168.1.1)' '') || exit 0; fi
+ dns=$(input DNS 'DNS server IP(s), separated by spaces. Blank inherits host DNS. Use your reachable LAN resolver.' '') || exit 0
  vlan=$(input VLAN 'Optional VLAN tag (leave blank for an untagged network)' '') || exit 0
  version=$(input 'Framewrk version' 'Published Framewrk version to install' "$version") || exit 0
 fi
+validate_dns "$dns" || fail 'Invalid DNS server IP.'
 number "$ctid" 100 999999999 || fail 'Invalid CTID.'
 number "$cores" 1 64 || fail 'Invalid CPU count.'
 number "$memory" 512 65536 || fail 'Invalid memory allocation.'
@@ -94,7 +115,7 @@ PY
 fi
 # Checks both VM and CT IDs cluster-wide, without changing existing guests.
 pvesh get /cluster/nextid --vmid "$ctid" >/dev/null || fail "ID $ctid is already in use."
-summary="Debian 12 · unprivileged\nCTID: $ctid   Hostname: $hostname\nCPU: $cores   RAM: $memory MB   Disk: $disk GB\nDisk storage: $root_storage   Templates: $template_storage\nBridge: $bridge   IPv4: $network   VLAN: ${vlan:-none}\nFramewrk: $version\n\nCreate this container and install Framewrk?"
+summary="Debian 12 · unprivileged\nCTID: $ctid   Hostname: $hostname\nCPU: $cores   RAM: $memory MB   Disk: $disk GB\nDisk storage: $root_storage   Templates: $template_storage\nBridge: $bridge   IPv4: $network   VLAN: ${vlan:-none}\nDNS: ${dns:-inherit host settings}\nFramewrk: $version\n\nCreate this container and install Framewrk?"
 ui --title 'Confirm installation' --yesno "$summary" 18 78 || exit 0
 work=$(mktemp -d)
 log=/var/log/framewrk-lxc-$(date -u +%Y%m%dT%H%M%S)-$$.log
@@ -114,17 +135,24 @@ printf '\n[3/5] Creating container %s…\n' "$ctid"
 net="name=eth0,bridge=$bridge,ip=$network,type=veth,firewall=1"
 [[ -z $gateway ]] || net+=",gw=$gateway"
 [[ -z $vlan ]] || net+=",tag=$vlan"
-pct create "$ctid" "$volume" --hostname "$hostname" --unprivileged 1 --cores "$cores" --memory "$memory" --swap 512 --rootfs "$root_storage:$disk" --net0 "$net" --onboot 1 --ostype debian --tags framewrk --description "Framewrk $version | http://IP:8770 | https://hangframewrk.io"
+create_args=("$ctid" "$volume")
+[[ -z $dns ]] || create_args+=(--nameserver "$dns")
+pct create "${create_args[@]}" --hostname "$hostname" --unprivileged 1 --cores "$cores" --memory "$memory" --swap 512 --rootfs "$root_storage:$disk" --net0 "$net" --onboot 1 --ostype debian --tags framewrk --description "Framewrk $version | http://IP:8770 | https://hangframewrk.io"
 created=true
 pct start "$ctid"
 pct push "$ctid" "$work/framewrk-lxc" /root/framewrk-lxc --perms 0755
 printf '\n[4/5] Waiting for container networking…\n'
-ready=false
-for _ in {1..60}; do
- if pct exec "$ctid" -- getent hosts ghcr.io >/dev/null 2>&1; then ready=true; break; fi
- sleep 2
-done
-[[ $ready == true ]] || fail 'Container DNS/network did not become ready. Check bridge, DHCP/static IP and firewall.'
+if ! network_ready; then
+ printf '\nContainer DNS configuration and routes:\n'
+ pct exec "$ctid" -- cat /etc/resolv.conf || true
+ pct exec "$ctid" -- ip -4 route || true
+ dns=$(input 'Container DNS failed' 'Required download hosts could not be resolved. Check the bridge/gateway/firewall. Enter a reachable LAN DNS server IP to retry, or cancel to keep the container for repair.' "$dns") || fail 'DNS/network check cancelled. Container kept for repair.'
+ [[ -n $dns ]] || fail 'No DNS server supplied. Repair container networking before retrying.'
+ validate_dns "$dns" || fail 'Invalid DNS server IP.'
+ pct set "$ctid" --nameserver "$dns"
+ pct reboot "$ctid"
+ network_ready || fail 'DNS still fails. Check LAN resolver reachability, bridge, gateway and firewall before retrying.'
+fi
 printf '\n[5/5] Installing Framewrk (this can take several minutes)…\n'
 pct exec "$ctid" -- bash /root/framewrk-lxc "$version"
 address=$(pct exec "$ctid" -- hostname -I | awk '{for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\./) {print $i; exit}}')

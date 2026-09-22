@@ -12,7 +12,7 @@ web address. There are no template filenames or command arguments to work out.
 
 **Default:** Debian 12, unprivileged, 2 CPU cores, 1 GB RAM, 8 GB disk, DHCP,
 automatic startup. **Advanced** lets you change the CTID, hostname, CPU, memory,
-disk size, IP/gateway, VLAN and Framewrk version. Storage and bridge choices come
+disk size, IP/gateway, DNS, VLAN and Framewrk version. Storage and bridge choices come
 from your host. The script will never overwrite an existing VM or container.
 
 Open the displayed address and get the initial app password with the command
@@ -26,6 +26,11 @@ pending. The installer runs Framewrk natively under systemd with its own service
 user. Docker, nesting and privileged LXC are not needed. Debian's system Python
 is unchanged; a separate Python 3.12 runtime is installed with pinned uv tooling.
 
+DNS inherits the Proxmox host settings unless you specify a reachable resolver
+in Advanced settings. DHCP does not necessarily supply the container DNS setting.
+The wizard checks Debian and other download hosts, and offers a DNS retry if those
+checks fail. Persistent DNS errors stop installation before package downloads.
+
 The host needs internet access to GitHub and Proxmox template servers. The
 container needs Debian mirrors, GHCR, PyPI and GitHub, plus your library/frame
 services. Allow TCP 8770 from your LAN/reverse proxy. Ensure enough storage for
@@ -35,6 +40,22 @@ more RAM than the default allocation.
 This is Framewrk's own script, inspired by the default/advanced host-console flow
 at [Community Scripts](https://community-scripts.org/). It is not a Community
 Scripts listing and does not load their remote framework.
+
+## If installation reports “Temporary failure resolving”
+
+Keep the created container. In Proxmox select **the container → DNS → Edit** and
+set a DNS server reachable from its network (usually your LAN resolver/router).
+Reboot that container. From the host Shell, replace `CTID` with its number:
+
+```bash
+pct exec CTID -- getent hosts deb.debian.org
+pct exec CTID -- bash /root/framewrk-lxc 1.3.0
+```
+
+Run the second command only after the first prints resolved addresses. If lookup
+still fails, inspect `pct config CTID`, `pct exec CTID -- cat /etc/resolv.conf` and
+`pct exec CTID -- ip -4 route`. Check the bridge/VLAN, gateway and firewall access
+to your DNS server. `apt --fix-missing` cannot repair unreachable DNS.
 
 ## Updates
 
