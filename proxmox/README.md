@@ -1,92 +1,68 @@
-# Framewrk on Proxmox LXC (preview)
+# Framewrk for Proxmox
 
-This installer is available for friend testing. It has not yet been validated on
-an actual Proxmox host. Use a new container and report results before relying on
-it for production. No Docker daemon, privileged container, nesting, host bind
-mount, or disabled AppArmor profile is required.
-
-Target for the first external test: **Proxmox VE 8.4.21 with Ubuntu 24.04 LTS**.
-
-## Requirements
-
-- A Proxmox host supporting the official Ubuntu 24.04 amd64 template.
-- An unused container ID, container storage with at least 8 GB free, and a network
-  bridge with DHCP. Defaults: 2 CPU cores, 1 GB RAM, 512 MB swap; increase memory
-  for large images or concurrent uploads. These are starting allocations, not
-  measured minimums.
-- Internet access to Ubuntu/Debian, GHCR and PyPI, plus access to your photo libraries
-  and frame services. Allow incoming TCP 8770 from your LAN/reverse proxy.
-- Root shell on the Proxmox host. The application runs as the `framewrk` user
-  inside an unprivileged container. Python 3.12 comes from Ubuntu 24.04. Debian 13 is also accepted on hosts supporting that template.
-
-The scripts contain no application source. Installation extracts the application
-and built console from the existing public versioned GHCR image using skopeo and
-umoci, then installs its Python dependencies at the image's recorded versions.
-Image layers are verified by the registry tooling; release checksums below verify
-the packaging download. The application remains subject to its existing license.
-
-## Install
-
-Download `framewrk-proxmox.tar.gz` and `framewrk-proxmox.sha256` from the
-[Framewrk 1.3.0 release](https://github.com/smichalczyk/framewrk/releases/tag/v1.3.0)
-to a new directory on your Proxmox host:
+In the **Proxmox host → Shell**, paste:
 
 ```bash
-curl -fLO https://github.com/smichalczyk/framewrk/releases/download/v1.3.0/framewrk-proxmox.tar.gz
-curl -fLO https://github.com/smichalczyk/framewrk/releases/download/v1.3.0/framewrk-proxmox.sha256
-sha256sum -c framewrk-proxmox.sha256
-tar -xzf framewrk-proxmox.tar.gz
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/smichalczyk/framewrk/main/proxmox/create.sh)"
 ```
 
-Read the included scripts before executing them. In Proxmox, download the official
-Ubuntu 24.04 template under your storage's **CT Templates** tab. `pveam list local`
-shows template volume IDs. Replace all placeholders below with your actual choices:
+Choose **Default**, select storage and a network bridge if asked, then confirm.
+The script downloads Debian, creates the LXC, installs Framewrk, and prints its
+web address. There are no template filenames or command arguments to work out.
+
+**Default:** Debian 12, unprivileged, 2 CPU cores, 1 GB RAM, 8 GB disk, DHCP,
+automatic startup. **Advanced** lets you change the CTID, hostname, CPU, memory,
+disk size, IP/gateway, VLAN and Framewrk version. Storage and bridge choices come
+from your host. The script will never overwrite an existing VM or container.
+
+Open the displayed address and get the initial app password with the command
+shown at the end. Use `pct enter CTID` to open a root shell in the container.
+For iOS, point your HTTPS reverse proxy to the container's port 8770.
+
+## Status and requirements
+
+Preview targeting **Proxmox VE 8.4.21**, amd64. Real Proxmox testing is still
+pending. The installer runs Framewrk natively under systemd with its own service
+user. Docker, nesting and privileged LXC are not needed. Debian's system Python
+is unchanged; a separate Python 3.12 runtime is installed with pinned uv tooling.
+
+The host needs internet access to GitHub and Proxmox template servers. The
+container needs Debian mirrors, GHCR, PyPI and GitHub, plus your library/frame
+services. Allow TCP 8770 from your LAN/reverse proxy. Ensure enough storage for
+the template, the container disk and later backups. Large photo batches may need
+more RAM than the default allocation.
+
+This is Framewrk's own script, inspired by the default/advanced host-console flow
+at [Community Scripts](https://community-scripts.org/). It is not a Community
+Scripts listing and does not load their remote framework.
+
+## Updates
+
+Take a Proxmox backup. Inside the container, run:
 
 ```bash
-bash proxmox/create.sh CTID TEMPLATE_VOLUME ROOTFS_STORAGE BRIDGE 1.3.0
-# Example shape (use your actual template filename):
-# bash proxmox/create.sh 120 local:vztmpl/ubuntu-24.04-standard_VERSION_amd64.tar.zst local-lvm vmbr0 1.3.0
+framewrk-lxc 1.3.0  # replace with the published version you want
 ```
 
-The script refuses an existing CTID. On failure it leaves the new container in
-place for inspection. After correcting networking/package issues, retry installation
-inside it using `/root/framewrk-lxc 1.3.0`; do not rerun container creation.
+The updater prepares the new code, stops Framewrk, backs up all application data,
+and starts the new version. A failed health check restores the previous code and
+data automatically. Old releases and backups remain until you remove them.
+For newer installer revisions, download the installer archive and checksum from
+[GitHub Releases](https://github.com/smichalczyk/framewrk/releases), verify with
+`sha256sum -c framewrk-proxmox.sha256`, extract it, and run its `framewrk-lxc`
+script inside the container.
 
-For an existing **dedicated Ubuntu 24.04 container**, copy `proxmox/framewrk-lxc`
-inside and run `bash framewrk-lxc 1.3.0` as root. Do not run it on the Proxmox host
-itself or in a container used by another application.
+## Troubleshooting and recovery
 
-Open `http://CONTAINER_IP:8770`. Get the generated password:
+The host log is `/var/log/framewrk-lxc-TIMESTAMP.log`. Application logs are
+`journalctl -u framewrk` inside the container. A failed creation/install keeps
+the container for inspection; the host script prints the retry command.
 
-```bash
-pct exec CTID -- journalctl -u framewrk
-```
-
-For iOS access, configure your reverse proxy with HTTPS pointing to this address.
-Use the same proxy settings described in the main Framewrk installation guide.
-Do not expose port 8770 directly to the internet.
-
-## Update and rollback
-
-Take a Proxmox backup first. Download the installer archive from the new release
-when it includes packaging changes; its `framewrk-lxc` script can be run directly
-to update both the application and installed updater. Otherwise, inside the
-container select an explicit release:
-
-```bash
-framewrk-lxc 1.3.0  # replace with the desired published version
-```
-
-The updater prepares a new release before stopping Framewrk. It then stops the
-service and copies **all** `/var/lib/framewrk` data, including SQLite WAL files
-and uploads, to `/var/backups/framewrk/TIMESTAMP`. It changes the current symlink,
-starts the service, and checks `/api/health` for up to 60 seconds. A failed health
-check restores the prior data and code automatically. Review logs after any error;
-power loss or an interrupted installer may require the manual recovery below.
-
-For manual rollback, stop the service first. Use the printed backup directory;
-`previous-release` contains the matching old application directory. Do not simply
-install an older version over a migrated database.
+Data: `/var/lib/framewrk`. Code: `/opt/framewrk/releases`. Current release:
+`/opt/framewrk/current`. Update backups: `/var/backups/framewrk/TIMESTAMP`.
+Backups contain private photos/settings; keep them private and prune old ones.
+Do not downgrade code alone over a migrated database. For manual rollback inside
+the container, select the backup printed by the update:
 
 ```bash
 systemctl stop framewrk
@@ -102,28 +78,13 @@ systemctl start framewrk
 curl -f http://127.0.0.1:8770/api/health
 ```
 
-Code is under `/opt/framewrk/releases`; `current` selects the active release.
-Backups and old releases are retained deliberately. After confirming an upgrade,
-remove older backups/releases you no longer need, keeping the active release and
-at least the previous matching code/data pair. Backups contain credentials and
-photos: keep them private. Normal application upload cleanup still applies, but
-backup copies remain until you remove them. Include the container disk in Proxmox
-backups. Uninstall by removing this dedicated CT through Proxmox after saving data.
+## First tester checklist
 
-## Friend testing checklist
-
-1. Record Proxmox version, Ubuntu template, storage type and networking.
-2. Install in a fresh unprivileged container without nesting. Confirm the console
-   loads and `systemctl status framewrk` reports active; verify the process user.
-3. Reboot the CT and verify automatic startup and persisted login/settings.
-4. Connect a test frame and library; verify a scheduled sync and orientation rules.
-5. Send photos through iOS over HTTPS; verify receipt, processing and cleanup.
-6. Reinstall the same version; verify backup creation and unchanged settings,
-   frames and sync history. Test manual rollback with the matching backup.
-7. Restore a Proxmox backup into an isolated network before testing it, so the
-   restored instance cannot send duplicate photos to live frames.
-8. Report failures via GitHub Discussions with redacted logs. Never include
-   passwords, device tokens, frame account details or photo contents.
-
-Host/LXC integration, shutdown behavior, network access and resource sizing remain
-unverified until this checklist has been completed on Proxmox.
+- Run the one-line installer on Proxmox 8.4.21 with **Default** settings.
+- Verify login, then reboot the CT and confirm automatic startup and saved settings.
+- Connect a test frame/library and verify sync, orientation rules and iOS uploads.
+- Reinstall the same version; check the backup and retained sync history.
+- Test rollback and Proxmox backup restoration in isolation so a restored copy
+  cannot send duplicate photos to live frames.
+- Report Proxmox version, storage, network settings and redacted failures via
+  [Discussions](https://github.com/smichalczyk/framewrk/discussions).

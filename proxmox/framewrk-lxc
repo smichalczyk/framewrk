@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install/update inside a dedicated, unprivileged Ubuntu 24.04 / Debian 13 LXC.
+# Install/update inside a dedicated, unprivileged Debian LXC.
 set -Eeuo pipefail
 umask 027
 fail() { echo "Error: $*" >&2; exit 1; }
@@ -8,8 +8,9 @@ fail() { echo "Error: $*" >&2; exit 1; }
 version=$1
 # shellcheck disable=SC1091
 . /etc/os-release
-[[ ( $ID == ubuntu && $VERSION_ID == 24.04 ) || ( $ID == debian && $VERSION_ID == 13 ) ]] || fail 'Ubuntu 24.04 or Debian 13 is required.'
-[[ $(ps -p 1 -o comm=) == systemd ]] || fail 'systemd must be running as PID 1.'
+[[ $ID == debian && ( $VERSION_ID == 12 || $VERSION_ID == 13 ) ]] || fail 'Debian 12 or 13 is required.'
+read -r init_process < /proc/1/comm
+[[ $init_process == systemd ]] || fail 'systemd must be running as PID 1.'
 systemd-detect-virt --container --quiet || fail 'Run inside a dedicated container, not on the host.'
 exec 9>/run/framewrk-install.lock
 flock -n 9 || fail 'Another install/update is running.'
@@ -37,7 +38,14 @@ release="$base/releases/$version-$(date -u +%Y%m%dT%H%M%S)-$$"
 install -d -m 755 "$release"
 cp "$work/image-digest" "$release/image-digest"
 cp -R "$app/src" "$app/web" "$app/LICENSE" "$app/requirements.txt" "$release/"
-python3 -m venv "$release/venv"
+# Debian's Python remains untouched; uv supplies a separate managed Python 3.12.
+python3 -m venv "$base/bootstrap"
+"$base/bootstrap/bin/pip" install --no-cache-dir --disable-pip-version-check 'uv==0.12.18'
+export UV_PYTHON_INSTALL_DIR="$base/python"
+export UV_PYTHON_BIN_DIR="$base/python-bin"
+"$base/bootstrap/bin/uv" venv --python 3.12 --managed-python "$release/venv"
+chmod -R a+rX "$base/python"
+"$release/venv/bin/python" --version > "$release/python-version"
 # Reuse the dependency versions shipped in the published image.
 python3 - "$work/bundle/rootfs" "$release/constraints.txt" <<'PYTHON'
 from pathlib import Path
@@ -52,7 +60,7 @@ if not pins:
     raise SystemExit('No dependency metadata in image')
 Path(sys.argv[2]).write_text('\n'.join(sorted(pins)) + '\n')
 PYTHON
-"$release/venv/bin/pip" install --no-cache-dir --disable-pip-version-check -r "$release/requirements.txt" -c "$release/constraints.txt"
+"$base/bootstrap/bin/uv" pip install --no-cache --python "$release/venv/bin/python" -r "$release/requirements.txt" -c "$release/constraints.txt"
 chmod -R a+rX "$release"
 previous=
 if [[ -L $base/current && -d $base/current ]]; then previous=$(readlink -f "$base/current"); fi
@@ -113,7 +121,7 @@ systemctl enable framewrk
 systemctl start framewrk || true
 healthy=false
 for _ in {1..30}; do
-  if systemctl is-active --quiet framewrk && curl --fail --silent http://127.0.0.1:8770/api/health | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(d.get("status") != "ok" or d.get("version") != sys.argv[1])' "$version"; then healthy=true; break; fi
+  if systemctl is-active --quiet framewrk && curl --fail --silent http://127.0.0.1:8770/api/health | python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(d.get("status") != "ok" or d.get("version") != sys.argv[1])' "$version" 2>/dev/null; then healthy=true; break; fi
   sleep 2
 done
 if [[ $healthy != true ]]; then rollback; fi

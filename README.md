@@ -294,8 +294,14 @@ PhotoPrism or Immich.
 
 ## Proxmox LXC preview
 
-Install Framewrk directly in an unprivileged Ubuntu 24.04 LXC, without Docker
+Install Framewrk directly in an unprivileged Debian 12 LXC, without Docker
 or nesting. The preview targets Proxmox VE 8.4.21 and awaits real-host testing.
+Run the guided installer from your Proxmox host Shell:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/smichalczyk/framewrk/main/proxmox/create.sh)"
+```
+
 See [installation, updates, rollback and the tester checklist](proxmox/README.md).
 Download the installer package and checksum from the
 [1.3.0 release](https://github.com/smichalczyk/framewrk/releases/tag/v1.3.0).
