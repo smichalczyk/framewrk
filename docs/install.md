@@ -392,10 +392,11 @@ revocable device token in Keychain.
 
 Choose up to 50 photos in the app, or select photos in Photos or another app
 and choose **Share → Framewrk**. Pick the frames and send. Background uploads
-continue after the sheet closes; **Recent** shows delivery and retries.
+continue after the sheet closes; **Recent** confirms when your server receives each photo.
 Nixplay sends use configured albums and disclose other frames playing them.
 
-Direct photos stay on the frames independently of library rules. The console’s
-**Direct sends** page shows history, and **Settings → Connected devices** revokes
+Frame orientation rules apply. Direct photos stay on the frames independently
+of library selection. The console’s
+**Direct sends** page shows delivery history and orientation skips, and **Settings → Connected devices** revokes
 a device. Full images are retained for retries for up to 7 days; previews last
 90 days. Allow at least 17 MiB request bodies through your HTTPS reverse proxy.
