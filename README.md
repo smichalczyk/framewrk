@@ -170,9 +170,13 @@ You are asked what should happen to the photos already on it:
   of what was sent is kept. Add the frame back later and Framewrk resumes
   instead of re-uploading everything.
 - **Stop syncing and delete the photos** — Aura removes every photo Framewrk put
-  there. Nixplay has no per-photo delete, so the equivalent is deleting the
+  there. For Nixplay, this explicit action deletes the
   album, which takes every photo in it on every frame playing it. Either way you
   type the name first.
+
+During normal syncs, both Aura and Nixplay remove tracked photos that no longer
+match a destination’s source or orientation rules. Nixplay removes only those
+photos from the destination album, leaving the album and other photos intact.
 
 ---
 
