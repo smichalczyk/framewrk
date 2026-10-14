@@ -25,6 +25,17 @@ logs. Free to use.
 
 ## Send directly from iPhone or iPad
 
+[Join the iPhone & iPad public beta on TestFlight](https://testflight.apple.com/join/HZ7kN8k9).
+Requires iOS/iPadOS 18+, your own Framewrk server over HTTPS, and an Aura or
+Nixplay account with a configured destination. Server 1.3.3 or later is recommended.
+PhotoPrism and Immich are optional for direct sends.
+
+Send feedback through TestFlight's **Send Beta Feedback** option. Include the app
+build (in Settings), server version, device, OS, and steps to reproduce. For
+sharing issues, include the photo count and the results in Recent and Direct sends.
+Review attachments for private photos or credentials before sending.
+[Setup and feedback guide](https://hangframewrk.io/install.html#send-directly-from-iphone-or-ipad).
+
 The Framewrk iOS beta can send photos without PhotoPrism or Immich. Connect
 Aura or Nixplay and configure a frame in the console, then connect the app to
 your HTTPS server address using your console password. The app stores a
